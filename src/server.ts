@@ -1,12 +1,43 @@
 import 'dotenv/config';
+import type { Server } from 'node:http';
 import { app } from './app.js';
+import { readEnvironment } from './config/env.js';
+import { connectDatabase, disconnectDatabase } from './config/database.js';
 
-const portValue = Number(process.env.PORT ?? 3000);
+let server: Server | undefined;
+let shuttingDown = false;
 
-if (!Number.isInteger(portValue) || portValue <= 0) {
-  throw new Error('PORT debe ser un entero positivo.');
+async function start(): Promise<void> {
+  const config = readEnvironment();
+  await connectDatabase(config);
+  server = app.listen(config.port, () => {
+    console.log(`API disponible en http://localhost:${config.port}/health`);
+    console.log('MongoDB conectado.');
+  });
 }
 
-app.listen(portValue, () => {
-  console.log(`API disponible en http://localhost:3000/health`);
+async function shutdown(): Promise<void> {
+  if (shuttingDown) return;
+  shuttingDown = true;
+  if (server) {
+    await new Promise<void>((resolve, reject) => {
+      server?.close((error) => (error ? reject(error) : resolve()));
+    });
+  }
+  await disconnectDatabase();
+  console.log('Servidor y conexión MongoDB cerrados.');
+}
+
+for (const signal of ['SIGINT', 'SIGTERM'] as const) {
+  process.on(signal, () => {
+    void shutdown().catch(() => {
+      console.error('No se pudo completar el cierre ordenado.');
+      process.exitCode = 1;
+    });
+  });
+}
+
+void start().catch(() => {
+  console.error('No se pudo iniciar la API. Comprueba la configuración de Atlas.');
+  process.exitCode = 1;
 });
