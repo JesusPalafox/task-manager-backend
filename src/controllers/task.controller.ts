@@ -1,51 +1,31 @@
-import type { NextFunction, Request, Response } from 'express';
+import type { Request, Response } from 'express';
 import {
-completeTask,
-createTask,
-deleteTask,
-findTaskById,
-listTasks
+  completeTask,
+  createTask,
+  deleteTask,
+  findTaskById,
+  listTasks,
 } from '../services/task.service.js';
-import { AppError } from '../errors/app-error.js';
-const parseId = (value: string | string[] | undefined): number => {
-const idValue = Array.isArray(value) ? value[0] : value;
-const id = Number(idValue);
-if (!Number.isInteger(id) || id <= 0) {
-throw new AppError('El id debe ser un entero positivo.', 400);
+
+export async function getTasks(_req: Request, res: Response): Promise<void> {
+  res.status(200).json({ data: await listTasks() });
 }
-return id;
-};
-export const getTasks = (_req: Request, res: Response): void => {
-res.status(200).json({ data: listTasks() });
-};
-export const getTask = (req: Request, res: Response, next: NextFunction): void => {
-try {
-res.status(200).json({ data: findTaskById(parseId(req.params.id)) });
-} catch (error: unknown) {
-next(error);
+
+export async function getTask(_req: Request, res: Response): Promise<void> {
+  res.status(200).json({ data: await findTaskById(res.locals.taskId as string) });
 }
-};
-export const postTask = (req: Request, res: Response, next: NextFunction): void => {
-try {
-const task = createTask(req.body.title);
-res.status(201).json({ data: task });
-} catch (error: unknown) {
-next(error);
+
+export async function postTask(_req: Request, res: Response): Promise<void> {
+  const task = await createTask(res.locals.taskTitle as string);
+  res.status(201).json({ data: task });
 }
-};
-export const patchTaskComplete = (req: Request, res: Response, next: NextFunction): void => {
-try {
-const task = completeTask(parseId(req.params.id));
-res.status(200).json({ data: task });
-} catch (error: unknown) {
-next(error);
+
+export async function patchTaskComplete(_req: Request, res: Response): Promise<void> {
+  const task = await completeTask(res.locals.taskId as string);
+  res.status(200).json({ data: task });
 }
-};
-export const removeTask = (req: Request, res: Response, next: NextFunction): void => {
-try {
-deleteTask(parseId(req.params.id));
-res.status(204).send();
-} catch (error: unknown) {
-next(error);
-}
+
+export async function removeTask(_req: Request, res: Response): Promise<void> {
+  await deleteTask(res.locals.taskId as string);
+  res.status(204).send();
 }
