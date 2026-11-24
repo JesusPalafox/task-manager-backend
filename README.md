@@ -1,86 +1,50 @@
-# Task Manager Backend
+# Task Manager Backend — API Express
 
-Aplicación de consola modular para gestionar tareas, construida con **Node.js** y **TypeScript**, sin interfaz gráfica ni framework web. Sirve como base conceptual para una futura API REST con Express.
-
-## Descripción
-
-El programa mantiene una colección de tareas en memoria (se reinicia en cada ejecución) y permite:
-
-- Listar todas las tareas registradas.
-- Crear una nueva tarea (validando que el título no esté vacío).
-- Completar una tarea existente por su `id`.
-- Eliminar una tarea existente por su `id` (desafío individual).
-- Listar únicamente las tareas pendientes (desafío individual).
-- Mostrar mensajes de error claros ante operaciones inválidas.
+API para las actividades de **Programación Backend con Frameworks**.
+Rama `feature/mongodb-atlas`: preparación EC2 F1 A5.
+El CRUD heredado permanece en memoria **solo durante A5**; las siguientes actividades lo migran a Atlas.
 
 ## Requisitos
 
-- Node.js (versión LTS)
-- PNPM
-- Git
+Node.js, PNPM, cuenta MongoDB Atlas y Postman.
 
-## Instalación
+## Variables
+
+Copia `.env.example` a `.env` en tu computadora. Define:
+- `PORT`: puerto local (3000).
+- `MONGODB_URI`: cadena de conexión de Atlas (nunca en GitHub).
+- `MONGODB_DB_NAME`: `task_api`.
+
+En Atlas usa un usuario con permisos `readWrite` solo en `task_api`.
+En acceso de red permite solo tu IP actual; **no abras el acceso a 0.0.0.0/0**.
+Nunca guardes la URI ni una contraseña real en documentación.
+
+## Instalar y verificar
 
 ```bash
 pnpm install
+pnpm check
+pnpm build
+pnpm dev
 ```
 
-## Comandos disponibles
+`pnpm install` también debe actualizar `pnpm-lock.yaml` al incorporar Mongoose.
+Guarda ese lockfile actualizado antes de entregar la actividad.
 
-| Comando | Descripción |
-|---|---|
-| `pnpm dev` | Ejecuta la app y la reinicia automáticamente al detectar cambios. |
-| `pnpm start` | Ejecuta la app una sola vez directamente desde TypeScript. |
-| `pnpm check` | Revisa los tipos de TypeScript sin generar archivos. |
-| `pnpm build` | Compila `src/` hacia `dist/`. |
-| `pnpm serve` | Ejecuta con Node.js el JavaScript ya compilado en `dist/`. |
+## Salud y rutas
 
-## Variables de entorno
+- `GET /health`: disponibilidad HTTP.
+- `GET /health/database`: ping real a Atlas; 503 ante indisponibilidad.
+- `GET /api/tasks`: listado heredado.
+- `GET /api/tasks/:id`: detalle heredado.
+- `POST /api/tasks`: crear tarea.
+- `PATCH /api/tasks/:id/complete`: completar.
+- `DELETE /api/tasks/:id`: eliminar.
 
-Copia `.env.example` a `.env` y ajusta los valores si lo deseas:
+Los errores nuevos se envían con `error.code`, `error.message` y `error.requestId`.
+Para cerrar, presiona Ctrl+C y verifica que se cierra MongoDB.
 
-```bash
-cp .env.example .env
-```
+## Evidencias
 
-| Variable | Descripción | Valor por defecto |
-|---|---|---|
-| `APP_NAME` | Nombre mostrado al iniciar la aplicación | `Task Manager Backend` |
-| `NODE_ENV` | Entorno de ejecución | `development` |
-
-> El archivo `.env` nunca debe subirse al repositorio (ya está excluido en `.gitignore`).
-
-## Estructura del proyecto
-
-```
-task-manager-backend/
-├── src/
-│   ├── data/
-│   │   └── tasks.ts          # Colección de tareas en memoria
-│   ├── models/
-│   │   └── task.ts           # Tipos e interfaz de una tarea
-│   ├── services/
-│   │   └── task.service.ts   # Reglas de negocio: crear, listar, completar, eliminar
-│   ├── utils/
-│   │   ├── delay.ts          # Utilidad de espera asíncrona
-│   │   └── env.ts            # Lectura de variables de entorno
-│   └── index.ts              # Punto de entrada de la aplicación
-├── docs/
-│   └── reflexion.md
-├── .env.example
-├── .gitignore
-├── package.json
-├── pnpm-lock.yaml
-├── preguntas-cierre.md
-├── README.md
-└── tsconfig.json
-```
-
-## Funcionalidades y manejo de errores
-
-La aplicación controla explícitamente:
-
-- Título vacío al crear una tarea.
-- Búsqueda o eliminación de una tarea con un `id` inexistente.
-- Intento de completar una tarea inexistente.
-- Errores no controlados durante la ejecución asíncrona (capturados en el `catch` final de `main`).
+Completa `docs/pruebas-conexion-mongodb.md` con resultados **reales** de Postman.
+No está verificado el acceso a tu cluster privado desde GitHub.

@@ -1,25 +1,20 @@
 {
   "name": "task-manager-backend",
   "version": "1.0.0",
-  "description": "Aplicación de consola modular para gestionar tareas, construida con Node.js y TypeScript.",
   "private": true,
   "type": "module",
-  "main": "dist/index.js",
+  "description": "API REST de tareas con Express, TypeScript y MongoDB Atlas",
   "scripts": {
-    "serve": "node dist/index.js",
     "dev": "tsx watch src/server.ts",
-"check": "tsc --noEmit",
-"build": "tsc",
-"start": "node dist/server.js"
-
+    "check": "tsc --noEmit",
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
-  "keywords": [
-    "node",
-    "typescript",
-    "backend",
-    "console"
-  ],
-  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^18.0.4",
+    "express": "^5.2.1",
+    "mongoose": "8.24.4"
+  },
   "devDependencies": {
     "@types/express": "^5.0.6",
     "@types/node": "^22.10.2",
@@ -30,9 +25,5 @@
     "onlyBuiltDependencies": [
       "esbuild"
     ]
-  },
-  "dependencies": {
-    "dotenv": "^18.0.4",
-    "express": "^5.2.1"
   }
 }
