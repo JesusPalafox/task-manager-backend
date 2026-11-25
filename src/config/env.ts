@@ -18,11 +18,19 @@ const expiresIn = process.env.JWT_EXPIRES_IN?.trim() || '1h';
 if (!/^\d+[smhd]$/.test(expiresIn)) {
   throw new Error('JWT_EXPIRES_IN debe usar un formato como 15m, 1h o 7d.');
 }
+function positiveInt(name: string, fallback: number): number {
+  const value = Number(process.env[name] ?? fallback);
+  if (!Number.isInteger(value) || value < 1) throw new Error(name + ' debe ser entero positivo.');
+  return value;
+}
 export const env = Object.freeze({
   JWT_SECRET: secret,
   JWT_EXPIRES_IN: expiresIn,
   JWT_ISSUER: process.env.JWT_ISSUER?.trim() || 'task-api-express',
   JWT_AUDIENCE: process.env.JWT_AUDIENCE?.trim() || 'task-api-client',
+  CORS_ORIGIN: required('CORS_ORIGIN'),
+  AUTH_RATE_LIMIT_WINDOW_MS: positiveInt('AUTH_RATE_LIMIT_WINDOW_MS', 900000),
+  AUTH_RATE_LIMIT_MAX: positiveInt('AUTH_RATE_LIMIT_MAX', 10),
 });
 export function readEnvironment(): AppConfig {
   const port = Number(process.env.PORT ?? 3000);
