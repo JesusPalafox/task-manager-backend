@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "API REST de tareas con Express, TypeScript y MongoDB Atlas",
+  "description": "API REST de tareas con Express TypeScript MongoDB Atlas y JWT",
   "scripts": {
     "dev": "tsx watch src/server.ts",
     "check": "tsc --noEmit",
@@ -11,19 +11,20 @@
     "start": "node dist/server.js"
   },
   "dependencies": {
-    "dotenv": "^18.0.4",
-    "express": "^5.2.1",
+    "bcryptjs": "3.0.3",
+    "dotenv": "17.2.2",
+    "express": "5.1.0",
+    "jose": "6.2.12",
     "mongoose": "8.24.4"
   },
   "devDependencies": {
-    "@types/express": "^5.0.6",
-    "@types/node": "^22.10.2",
-    "tsx": "^4.19.2",
-    "typescript": "^5.7.2"
+    "@types/express": "5.0.3",
+    "@types/node": "24.3.1",
+    "tsx": "4.20.5",
+    "typescript": "5.9.2"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  }
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "packageManager": "pnpm@11.25.0"
 }
