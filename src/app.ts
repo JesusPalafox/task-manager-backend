@@ -1,6 +1,8 @@
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
+import { openApiDocument } from './docs/openapi.js';
 import { taskRouter } from './routes/task.routes.js';
-import { corsPolicy, securityHeaders } from './middlewares/security.middleware.js';
+import { corsPolicy, documentationSecurityHeaders, securityHeaders } from './middlewares/security.middleware.js';
 import { authRouter } from './routes/auth.routes.js';
 import { healthRouter } from './routes/health.routes.js';
 import { requestContext } from './middlewares/request-context.middleware.js';
@@ -10,6 +12,8 @@ import { errorHandler } from './middlewares/error.middleware.js';
 export const app = express();
 app.disable('x-powered-by');
 app.use(requestContext);
+app.get('/api-docs.json', documentationSecurityHeaders, (_req, res) => { res.json(openApiDocument); });
+app.use('/api-docs', documentationSecurityHeaders, swaggerUi.serve, swaggerUi.setup(openApiDocument, { customSiteTitle: 'Task API Express' }));
 app.use(securityHeaders);
 app.use(corsPolicy);
 app.use(express.json({ limit: '20kb' }));
