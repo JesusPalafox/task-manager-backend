@@ -1,0 +1,8 @@
+:root{font-family:Inter,system-ui,sans-serif;color:#172033;background:#eef2f8;font-synthesis:none}
+*{box-sizing:border-box}body{margin:0}header{background:#172554;color:white;padding:2.5rem max(1rem,calc((100vw - 900px)/2))}
+header h1{margin:.4rem 0}.app main{max-width:900px;margin:2rem auto;padding:0 1rem}.panel{padding:1.5rem;background:white;border-radius:1rem;border:1px solid #dbe2ef;box-shadow:0 8px 24px #0f172a0d}
+form{display:grid;gap:.65rem;max-width:480px}input{padding:.8rem;border:1px solid #94a3b8;border-radius:.5rem}
+button{border:0;border-radius:.5rem;padding:.75rem 1.1rem;background:#1d4ed8;color:white;cursor:pointer}
+button:disabled{opacity:.6}.heading{display:flex;justify-content:space-between;align-items:center;gap:1rem}
+dt{font-size:.8rem;color:#64748b}dd{margin:0 0 1rem}.notice{background:#fff6db;padding:1rem;border-radius:.5rem}
+li{padding:.5rem 0;border-bottom:1px solid #e2e8f0}
