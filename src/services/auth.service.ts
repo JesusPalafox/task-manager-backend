@@ -2,7 +2,7 @@ import { env } from '../config/env.js';
 import { AppError } from '../errors/app-error.js';
 import type { User } from '../models/user.js';
 import {
-  createUserDocument, findUserDocumentByEmail, type UserDocument,
+  createUserDocument, findUserDocumentByEmail, findUserDocumentById, type UserDocument,
 } from '../repositories/user.repository.js';
 import type { LoginInput, LoginResult, RegisterInput, RegisterResult } from '../types/auth.js';
 import { hashPassword, verifyPassword } from './password.service.js';
@@ -36,4 +36,12 @@ export async function loginUser(input: LoginInput): Promise<LoginResult> {
   const user = toPublicUser(document);
   return { user, accessToken: await createAccessToken(user), tokenType: 'Bearer',
     expiresIn: env.JWT_EXPIRES_IN };
+}
+
+export async function getAuthenticatedUser(userId: string): Promise<User> {
+  const document = await findUserDocumentById(userId);
+  if (!document) throw new AppError(
+    'La cuenta asociada al token ya no está disponible.', 401, 'AUTHENTICATED_USER_NOT_FOUND',
+  );
+  return toPublicUser(document);
 }
