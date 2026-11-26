@@ -52,5 +52,18 @@ void start().catch((error: unknown) => {
   if (typeof safeCode === 'string' || typeof safeCode === 'number') {
     console.error('Código:', safeCode);
   }
+  if (startupPhase === 'leer la configuración' && error instanceof Error) {
+    // La lista permitida contiene solo nombres de variables y descripciones,
+    // nunca sus valores ni la cadena privada de MongoDB.
+    const allowed = [
+      'Falta la variable de entorno ',
+      'PORT inválido.',
+      'MONGODB_URI inválida.',
+      'MONGODB_DB_NAME inválido.',
+    ];
+    const safe = allowed.some(prefix => error.message.startsWith(prefix))
+      && !/[\r\n]/.test(error.message);
+    console.error('Validación:', safe ? error.message : 'Valor de configuración inválido.');
+  }
   process.exitCode = 1;
 });
