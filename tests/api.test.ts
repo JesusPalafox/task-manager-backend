@@ -61,12 +61,14 @@ beforeEach(async () => {
 describe('Backend A11 — HTTP, documentación y seguridad', () => {
   it('publica OpenAPI, Swagger y cabeceras seguras', async () => {
     const health = await request(app).get('/health').expect(200);
-    expect(health.body.status).toBe('ok');
+    expect(health.body.data.status).toBe('up');
+    expect(health.body.data.version).toBe('1.0.0');
     expect(health.headers['x-powered-by']).toBeUndefined();
     expect(health.headers['x-content-type-options']).toBe('nosniff');
     expect(typeof health.headers['x-request-id']).toBe('string');
     const spec = await request(app).get('/api-docs.json').expect(200);
     expect(spec.body.openapi).toBe('3.1.0');
+    expect(spec.body.servers[0].url).toBe('http://localhost:3000');
     expect(spec.body.paths['/api/auth/me']).toBeDefined();
     expect(spec.body.components.securitySchemes.bearerAuth.scheme).toBe('bearer');
     const swagger = await request(app).get('/api-docs/').expect(200);

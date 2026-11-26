@@ -1,3 +1,4 @@
+import { env } from '../config/env.js';
 const json = (schema: unknown) => ({ content: { 'application/json': { schema } } });
 const ref = (name: string) => ({ $ref: '#/components/schemas/' + name });
 const error = (code: number) => ({ description: 'Respuesta HTTP ' + code, ...json(ref('ErrorEnvelope')) });
@@ -7,10 +8,10 @@ export const openApiDocument = {
   openapi: '3.1.0',
   info: {
     title: 'Task API Express',
-    version: '1.0.0',
+    version: env.APP_VERSION,
     description: 'API de tareas con JWT, roles y MongoDB Atlas',
   },
-  servers: [{ url: 'http://localhost:3000', description: 'Entorno local' }],
+  servers: [{ url: env.PUBLIC_API_URL, description: env.NODE_ENV === 'production' ? 'Producción' : 'Local' }],
   tags: [{ name: 'Health' }, { name: 'Auth' }, { name: 'Tasks' }],
   paths: {
     '/health': { get: { tags: ['Health'], summary: 'Salud HTTP',
@@ -67,8 +68,8 @@ export const openApiDocument = {
       Order: { in: 'query', name: 'order', schema: { type: 'string', enum: ['asc','desc'] } },
     },
     schemas: {
-      Health: { type: 'object', properties: { status: { type: 'string', const: 'ok' } } },
-      DatabaseHealth: { type: 'object', properties: { status: { type: 'string' }, database: { type: 'string' } } },
+      Health: { type: 'object', required: ['data'], properties: { data: { type: 'object', required: ['status', 'version', 'environment'], properties: { status: { type: 'string', const: 'up' }, version: { type: 'string' }, environment: { type: 'string' } } } } },
+      DatabaseHealth: { type: 'object', required: ['data'], properties: { data: { type: 'object', properties: { status: { type: 'string', enum: ['up', 'down'] } } } } },
       User: { type: 'object', required: ['id','name','email','role','createdAt','updatedAt'],
         properties: { id: { type: 'string' }, name: { type: 'string' }, email: { type: 'string',format:'email' },
           role: { type: 'string', enum: ['user','admin'] }, createdAt: { type: 'string',format:'date-time' },

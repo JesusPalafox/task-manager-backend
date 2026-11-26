@@ -1,7 +1,7 @@
 import type { ApiData, ApiError, TaskList, User } from './types';
 
 const apiBaseUrl = (import.meta.env.VITE_API_URL || 'http://localhost:3000').replace(/\/$/, '');
-async function request<T>(path: string, options: RequestInit = {}, token?: string): Promise<T> {
+export async function request<T>(path: string, options: RequestInit = {}, token?: string): Promise<T> {
   let response: Response;
   try {
     response = await fetch(`${apiBaseUrl}${path}`, {
@@ -24,6 +24,12 @@ async function request<T>(path: string, options: RequestInit = {}, token?: strin
     throw new Error(error?.error?.message || `Error HTTP ${response.status}`);
   }
   return body as T;
+}
+export async function register(name: string, email: string, password: string): Promise<User> {
+  const result = await request<ApiData<{ user: User }>>('/api/auth/register', {
+    method: 'POST', body: JSON.stringify({ name, email, password }),
+  });
+  return result.data.user;
 }
 export async function login(email: string, password: string): Promise<{ user: User; accessToken: string }> {
   const result = await request<ApiData<{ user: User; accessToken: string }>>(

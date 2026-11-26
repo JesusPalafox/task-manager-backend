@@ -1,17 +1,21 @@
 import 'dotenv/config';
 import type { Server } from 'node:http';
 import { app } from './app.js';
-import { readEnvironment } from './config/env.js';
+import { env, readEnvironment } from './config/env.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
 
 let server: Server | undefined;
 let shuttingDown = false;
 
+let startupPhase = 'leer la configuración';
+
 async function start(): Promise<void> {
   const config = readEnvironment();
+  startupPhase = 'conectar MongoDB Atlas';
   await connectDatabase(config);
-  server = app.listen(config.port, () => {
-    console.log(`API disponible en http://localhost:${config.port}/health`);
+  startupPhase = 'abrir el puerto HTTP';
+  server = app.listen(config.port, '0.0.0.0', () => {
+    console.log(`API ${env.APP_VERSION} disponible en ${env.PUBLIC_API_URL}`);
     console.log('MongoDB conectado.');
   });
 }
@@ -37,7 +41,29 @@ for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   });
 }
 
-void start().catch(() => {
-  console.error('No se pudo iniciar la API. Comprueba la configuración de Atlas.');
+void start().catch((error: unknown) => {
+  // No imprimir mensajes ni objetos de error: podrían contener la URI o secretos.
+  const diagnostic = error !== null && typeof error === 'object'
+    ? error as { name?: unknown; code?: unknown; cause?: { code?: unknown } }
+    : {};
+  const safeCode = diagnostic.code ?? diagnostic.cause?.code;
+  console.error('Fallo al iniciar:', startupPhase);
+  console.error('Tipo:', typeof diagnostic.name === 'string' ? diagnostic.name : 'Desconocido');
+  if (typeof safeCode === 'string' || typeof safeCode === 'number') {
+    console.error('Código:', safeCode);
+  }
+  if (startupPhase === 'leer la configuración' && error instanceof Error) {
+    // La lista permitida contiene solo nombres de variables y descripciones,
+    // nunca sus valores ni la cadena privada de MongoDB.
+    const allowed = [
+      'Falta la variable de entorno ',
+      'PORT inválido.',
+      'MONGODB_URI inválida.',
+      'MONGODB_DB_NAME inválido.',
+    ];
+    const safe = allowed.some(prefix => error.message.startsWith(prefix))
+      && !/[\r\n]/.test(error.message);
+    console.error('Validación:', safe ? error.message : 'Valor de configuración inválido.');
+  }
   process.exitCode = 1;
 });
