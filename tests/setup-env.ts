@@ -8,3 +8,8 @@ process.env.JWT_AUDIENCE = 'task-api-client';
 process.env.CORS_ORIGIN = 'http://localhost:5173';
 process.env.AUTH_RATE_LIMIT_WINDOW_MS = '900000';
 process.env.AUTH_RATE_LIMIT_MAX = '100';
+
+process.env.NODE_ENV = 'test';
+process.env.APP_VERSION = '1.0.0';
+process.env.PUBLIC_API_URL = 'http://localhost:3000';
+process.env.TRUST_PROXY_HOPS = '0';

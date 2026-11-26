@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import type { Server } from 'node:http';
 import { app } from './app.js';
-import { readEnvironment } from './config/env.js';
+import { env, readEnvironment } from './config/env.js';
 import { connectDatabase, disconnectDatabase } from './config/database.js';
 
 let server: Server | undefined;
@@ -10,8 +10,8 @@ let shuttingDown = false;
 async function start(): Promise<void> {
   const config = readEnvironment();
   await connectDatabase(config);
-  server = app.listen(config.port, () => {
-    console.log(`API disponible en http://localhost:${config.port}/health`);
+  server = app.listen(config.port, '0.0.0.0', () => {
+    console.log(`API ${env.APP_VERSION} disponible en ${env.PUBLIC_API_URL}`);
     console.log('MongoDB conectado.');
   });
 }

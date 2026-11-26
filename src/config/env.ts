@@ -23,12 +23,34 @@ function positiveInt(name: string, fallback: number): number {
   if (!Number.isInteger(value) || value < 1) throw new Error(name + ' debe ser entero positivo.');
   return value;
 }
+function nonNegativeInt(name: string, fallback: number): number {
+  const n = Number(process.env[name] ?? fallback);
+  if (!Number.isInteger(n) || n < 0) throw new Error(name + ' debe ser un entero no negativo.');
+  return n;
+}
+function httpUrl(name: string): string {
+  const input = required(name).replace(/\/$/, '');
+  let url: URL;
+  try { url = new URL(input); } catch { throw new Error(name + ' requiere una URL absoluta.'); }
+  if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password ||
+      url.search || url.hash || (name === 'CORS_ORIGIN' && url.pathname !== '/'))
+    throw new Error(name + ' requiere un origen http(s) sin credenciales ni parámetros.');
+  if (process.env.NODE_ENV === 'production' && url.protocol !== 'https:')
+    throw new Error(name + ' debe usar HTTPS en producción.');
+  return input;
+}
+const nodeEnv = process.env.NODE_ENV?.trim() || 'development';
+if (!['development', 'test', 'production'].includes(nodeEnv)) throw new Error('NODE_ENV inválido.');
 export const env = Object.freeze({
+  NODE_ENV: nodeEnv,
+  APP_VERSION: process.env.APP_VERSION?.trim() || '1.0.0',
+  PUBLIC_API_URL: httpUrl('PUBLIC_API_URL'),
+  TRUST_PROXY_HOPS: nonNegativeInt('TRUST_PROXY_HOPS', 0),
   JWT_SECRET: secret,
   JWT_EXPIRES_IN: expiresIn,
   JWT_ISSUER: process.env.JWT_ISSUER?.trim() || 'task-api-express',
   JWT_AUDIENCE: process.env.JWT_AUDIENCE?.trim() || 'task-api-client',
-  CORS_ORIGIN: required('CORS_ORIGIN'),
+  CORS_ORIGIN: httpUrl('CORS_ORIGIN'),
   AUTH_RATE_LIMIT_WINDOW_MS: positiveInt('AUTH_RATE_LIMIT_WINDOW_MS', 900000),
   AUTH_RATE_LIMIT_MAX: positiveInt('AUTH_RATE_LIMIT_MAX', 10),
 });
