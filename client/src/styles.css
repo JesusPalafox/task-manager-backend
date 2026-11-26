@@ -1,8 +1,14 @@
 :root{font-family:Inter,system-ui,sans-serif;color:#172033;background:#eef2f8;font-synthesis:none}
-*{box-sizing:border-box}body{margin:0}header{background:#172554;color:white;padding:2.5rem max(1rem,calc((100vw - 900px)/2))}
-header h1{margin:.4rem 0}.app main{max-width:900px;margin:2rem auto;padding:0 1rem}.panel{padding:1.5rem;background:white;border-radius:1rem;border:1px solid #dbe2ef;box-shadow:0 8px 24px #0f172a0d}
-form{display:grid;gap:.65rem;max-width:480px}input{padding:.8rem;border:1px solid #94a3b8;border-radius:.5rem}
+*{box-sizing:border-box}body{margin:0}header{background:#172554;color:white;padding:2.5rem max(1rem,calc((100vw - 950px)/2))}
+header h1{margin:.4rem 0}.app main{max-width:950px;margin:2rem auto;padding:0 1rem}
+.workspace{display:grid;gap:1.2rem}.panel{padding:1.5rem;background:white;border-radius:1rem;border:1px solid #dbe2ef;box-shadow:0 8px 24px #0f172a0d}
+form{display:grid;gap:.65rem;max-width:600px}input,select{padding:.7rem;border:1px solid #94a3b8;border-radius:.5rem;width:100%;background:white;color:#172033}
 button{border:0;border-radius:.5rem;padding:.75rem 1.1rem;background:#1d4ed8;color:white;cursor:pointer}
-button:disabled{opacity:.6}.heading{display:flex;justify-content:space-between;align-items:center;gap:1rem}
-dt{font-size:.8rem;color:#64748b}dd{margin:0 0 1rem}.notice{background:#fff6db;padding:1rem;border-radius:.5rem}
-li{padding:.5rem 0;border-bottom:1px solid #e2e8f0}
+button:disabled{opacity:.6;cursor:not-allowed}.secondary{background:#dbeafe;color:#172554}
+.danger{background:#991b1b}.text-button{background:transparent;color:#1d4ed8;padding:0;margin-top:1.1rem}
+.heading,.task-actions{display:flex;justify-content:space-between;align-items:center;gap:.6rem;flex-wrap:wrap}
+.notice{background:#fff6db;padding:1rem;border-radius:.5rem}.filter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1rem}
+.filter-grid label{display:grid;gap:.4rem}.task-list{list-style:none;margin:0;padding:0}
+.task-row{padding:1rem 0;border-bottom:1px solid #e2e8f0;display:flex;justify-content:space-between;align-items:center;gap:1rem}
+.task-info{flex:1;min-width:150px}.task-info p{margin:.35rem 0;color:#475569}.pagination{display:flex;align-items:center;justify-content:space-between;gap:1rem}
+@media(max-width:680px){.task-row,.pagination{display:block}.task-actions{justify-content:flex-start;margin-top:.75rem}}
