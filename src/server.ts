@@ -7,9 +7,13 @@ import { connectDatabase, disconnectDatabase } from './config/database.js';
 let server: Server | undefined;
 let shuttingDown = false;
 
+let startupPhase = 'leer la configuración';
+
 async function start(): Promise<void> {
   const config = readEnvironment();
+  startupPhase = 'conectar MongoDB Atlas';
   await connectDatabase(config);
+  startupPhase = 'abrir el puerto HTTP';
   server = app.listen(config.port, '0.0.0.0', () => {
     console.log(`API ${env.APP_VERSION} disponible en ${env.PUBLIC_API_URL}`);
     console.log('MongoDB conectado.');
@@ -37,7 +41,16 @@ for (const signal of ['SIGINT', 'SIGTERM'] as const) {
   });
 }
 
-void start().catch(() => {
-  console.error('No se pudo iniciar la API. Comprueba la configuración de Atlas.');
+void start().catch((error: unknown) => {
+  // No imprimir mensajes ni objetos de error: podrían contener la URI o secretos.
+  const diagnostic = error !== null && typeof error === 'object'
+    ? error as { name?: unknown; code?: unknown; cause?: { code?: unknown } }
+    : {};
+  const safeCode = diagnostic.code ?? diagnostic.cause?.code;
+  console.error('Fallo al iniciar:', startupPhase);
+  console.error('Tipo:', typeof diagnostic.name === 'string' ? diagnostic.name : 'Desconocido');
+  if (typeof safeCode === 'string' || typeof safeCode === 'number') {
+    console.error('Código:', safeCode);
+  }
   process.exitCode = 1;
 });
